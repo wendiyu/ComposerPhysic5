@@ -152,7 +152,7 @@ local function removeEnemy( event )
     Enemy = nil
 end 
 
-local function enemyonCollision( event )
+local function enemyOnCollision( event )
  
     if ( event.phase == "began" ) then
  
@@ -184,6 +184,8 @@ local function enemyonCollision( event )
             -- fad character out before removing it 
             transition.to( Enemy, {time=2000, x=x, y=y, alpha = 0})
 
+	    --remove character after 1 second
+            timer.performWithDelay( 3000, removeEnemy )
 
             -- Increase score
             print ("you could increase a score here.")
@@ -352,24 +354,24 @@ function scene:create( event )
     jumpButton.alpha = 0.5
     jumpButton.id = "jump Button"
  
-     shootButton = display.newImage("./assets/sprites/jumpButton.png")
-     shootButton.x =  display.contentWidth - 80
-     shootButton.y = display.contentHeight - 80
-     shootButton.alpha = 0.5
-     shootButton.id = "shoot Button"
+    shootButton = display.newImage("./assets/sprites/jumpButton.png")
+    shootButton.x =  display.contentWidth - 80
+    shootButton.y = display.contentHeight - 80
+    shootButton.alpha = 0.5
+    shootButton.id = "shoot Button"
  
  
 
-      local filename = "assets/maps/level0.json" 
-      local mapData = json.decodeFile( system.pathForFile( filename, system.ResourceDirectory ) )
-      map = tiled.new( mapData, "assets/maps" )
+     local filename = "assets/maps/level0.json" 
+     local mapData = json.decodeFile( system.pathForFile( filename, system.ResourceDirectory ) )
+     map = tiled.new( mapData, "assets/maps" )
 
-      sceneGroup:insert( map )
-      sceneGroup:insert( ninjaBoy )
-      sceneGroup:insert( Enemy )
-      sceneGroup:insert( rightArrow )
-      sceneGroup:insert( jumpButton )
-      sceneGroup:insert( shootButton )
+     sceneGroup:insert( map )
+     sceneGroup:insert( ninjaBoy )
+     sceneGroup:insert( Enemy )
+     sceneGroup:insert( rightArrow )
+     sceneGroup:insert( jumpButton )
+     sceneGroup:insert( shootButton )
 
 end
  
@@ -390,7 +392,7 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         Runtime:addEventListener ( "enterFrame", moveNinjaBoy )
         Runtime:addEventListener ( "enterFrame", checkPlayerKunaisOutOfBounds )
-	Runtime:addEventListener ( "collision", enemyonCollision )
+	Runtime:addEventListener ( "collision", enemyOnCollision )
 		
  
     end
@@ -413,7 +415,7 @@ function scene:hide( event )
         -- Code here runs immediately after the scene goes entirely off screen
         Runtime:removeEventListener ( "enterFrame", moveNinjaBoy )
         Runtime:removeEventListener ( "enterFrame", checkPlayerKunaisOutOfBounds )
-	Runtime:removeEventListener ( "collision", enemyonCollision )
+	Runtime:removeEventListener ( "collision", enemyOnCollision )
  
     end
 end
