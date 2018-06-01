@@ -161,8 +161,8 @@ local function enemyOnCollision( event )
         local whereCollisonOccurredX = obj1.x
         local whereCollisonOccurredY = obj1.y
 
-        if ( ( obj1.id == "enemy" and obj2.id == "kunais" ) or
-             ( obj1.id == "kunai" and obj2.id == "enemy" ) ) then
+        if ( ( obj1.id == "enemy" and obj2.id == "bullet" ) or
+             ( obj1.id == "bullet" and obj2.id == "enemy" ) ) then
             
             -- remove the kunai
             local kunaisCounter = nil
@@ -181,10 +181,10 @@ local function enemyOnCollision( event )
             Enemy:setSequence( "dead" )
             Enemy:play()
 
-            -- fad character out before removing it 
+            -- fade character out before removing it 
             transition.to( Enemy, {time=2000, x=x, y=y, alpha = 0})
 
-	    --remove character after 1 second
+	        --remove character after 1 second
             timer.performWithDelay( 3000, removeEnemy )
 
             -- Increase score
