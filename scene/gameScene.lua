@@ -288,52 +288,88 @@ function scene:create( event )
         sheet = sheetJumpingNinja
     } 
 }
-        ninjaBoy = display.newSprite( sheetIdleNinja, sequence_data_ninja )
-        ninjaBoy.x = display.contentWidth * 0.5
-        ninjaBoy.y = 0
-        ninjaBoy.id = "ninjaBoy"
-        ninjaBoy.sequence = "idle"
-        -- add physics
-        physics.addBody(ninjaBoy, "dynamic", {
-            density = 2.5,
-            friction = 0.1,
-            bounce = 0.2
-            })
-        ninjaBoy.isFixedRotation = true -- If you apply this property before the physics.addBody() command for the object, it will merely be treated as a property of the object like any other custom property and, in that case, it will not cause any physical change in terms of locking rotation. 
+     ninjaBoy = display.newSprite( sheetIdleNinja, sequence_data_ninja )
+     ninjaBoy.x = display.contentWidth * 0.5
+     ninjaBoy.y = 0
+     ninjaBoy.id = "ninjaBoy"
+     ninjaBoy.sequence = "idle"
+     -- add physics
+     physics.addBody(ninjaBoy, "dynamic", {density = 2.5, friction = 0.1, bounce = 0.0})
+     ninjaBoy.isFixedRotation = true -- If you apply this property before the physics.addBody() command for the object, it will merely be treated as a property of the object like any other custom property and, in that case, it will not cause any physical change in terms of locking rotation. 
 
-        ninjaBoy:setSequence( "idle" )
-        ninjaBoy:play()
+     ninjaBoy:setSequence( "idle" )
+     ninjaBoy:play()
+	
+	-- add 1 enemy
+    local sheetOptionsIdleEnemy = require("assets.spritesheets.zombieMale.zombieMaleIdle")
+    local sheetIdleEnemy = graphics.newImageSheet( "./assets/spritesheets/zombieMale/zombieMaleIdle.png", sheetOptionsIdleEnemy:getSheet() )
 
-        -- add right arrow
-        rightArrow = display.newImage("./assets/sprites/rightButton.png")
-        rightArrow.x = 268
-        rightArrow.y = display.contentHeight - 150
-        rightArrow.alpha = 0.5
-        rightArrow.id = "right arrow"
+    local sheetOptionsDeadEnemy = require("assets.spritesheets.zombieMale.zombieMaleDead")
+    local sheetDeadEnemy = graphics.newImageSheet( "./assets/spritesheets/zombieMale/zombieMaleDead.png", sheetOptionsDeadEnemy:getSheet() )
+
+    	-- sequences table
+    local sequence_data_enemy = {
+        -- consecutive frames sequence
+        {
+            name = "idle",
+            start = 1,
+            count = 15,
+            time = 1000,
+            loopCount = 0,
+            sheet = sheetIdleEnemy
+        },
+        {
+            name = "dead",
+            start = 1,
+            count = 12,
+            time = 1000,
+            loopCount = 1,
+            sheet = sheetDeadEnemy
+        }
+    }
+
+    Enemy = display.newSprite( sheetIdleEnemy, sequence_data_enemy )
+    -- Add physics
+    physics.addBody( Enemy, "dynamic", { density = 3, bounce = 0, friction =  1.0 } )
+    Enemy.isFixedRotation = true
+    Enemy.id = "enemy"
+    Enemy.sequence = "idle"
+    Enemy.x = display.contentWidth - 250
+    Enemy.y = display.contentCenterY
+    Enemy:setSequence( "idle" )
+    Enemy:play()
+
+    -- add right arrow
+    rightArrow = display.newImage("./assets/sprites/rightButton.png")
+    rightArrow.x = 268
+    rightArrow.y = display.contentHeight - 150
+    rightArrow.alpha = 0.5
+    rightArrow.id = "right arrow"
  
-        jumpButton = display.newImage("./assets/sprites/jumpButton.png")
-        jumpButton.x =  display.contentWidth - 250
-        jumpButton.y = display.contentHeight - 80
-        jumpButton.alpha = 0.5
-        jumpButton.id = "jump Button"
+    jumpButton = display.newImage("./assets/sprites/jumpButton.png")
+    jumpButton.x =  display.contentWidth - 250
+    jumpButton.y = display.contentHeight - 80
+    jumpButton.alpha = 0.5
+    jumpButton.id = "jump Button"
  
-        shootButton = display.newImage("./assets/sprites/jumpButton.png")
-        shootButton.x =  display.contentWidth - 80
-        shootButton.y = display.contentHeight - 80
-        shootButton.alpha = 0.5
-        shootButton.id = "shoot Button"
+     shootButton = display.newImage("./assets/sprites/jumpButton.png")
+     shootButton.x =  display.contentWidth - 80
+     shootButton.y = display.contentHeight - 80
+     shootButton.alpha = 0.5
+     shootButton.id = "shoot Button"
  
  
 
-        local filename = "assets/maps/level0.json" 
-        local mapData = json.decodeFile( system.pathForFile( filename, system.ResourceDirectory ) )
-        map = tiled.new( mapData, "assets/maps" )
+      local filename = "assets/maps/level0.json" 
+      local mapData = json.decodeFile( system.pathForFile( filename, system.ResourceDirectory ) )
+      map = tiled.new( mapData, "assets/maps" )
 
-        sceneGroup:insert( map )
-        sceneGroup:insert( ninjaBoy )
-        sceneGroup:insert( rightArrow )
-        sceneGroup:insert( jumpButton )
-        sceneGroup:insert( shootButton )
+      sceneGroup:insert( map )
+      sceneGroup:insert( ninjaBoy )
+      sceneGroup:insert( Enemy )
+      sceneGroup:insert( rightArrow )
+      sceneGroup:insert( jumpButton )
+      sceneGroup:insert( shootButton )
 
 end
  
@@ -354,6 +390,8 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         Runtime:addEventListener ( "enterFrame", moveNinjaBoy )
         Runtime:addEventListener ( "enterFrame", checkPlayerKunaisOutOfBounds )
+	Runtime:addEventListener ( "collision", enemyonCollision )
+		
  
     end
 end
@@ -375,6 +413,7 @@ function scene:hide( event )
         -- Code here runs immediately after the scene goes entirely off screen
         Runtime:removeEventListener ( "enterFrame", moveNinjaBoy )
         Runtime:removeEventListener ( "enterFrame", checkPlayerKunaisOutOfBounds )
+	Runtime:removeEventListener ( "collision", enemyonCollision )
  
     end
 end
